@@ -1,0 +1,22 @@
+{
+  "name": "app",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "esbuild": "^0.27.2"
+  },
+  "scripts": {
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
+    "build:css": "npm run build:css:app && npm run build:css:admin",
+    "build:css:app": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
+    "build:css:admin": "npx @tailwindcss/cli -i ./app/assets/stylesheets/admin.tailwind.css -o ./app/assets/builds/admin.css --minify",
+    "build:css:watch": "concurrently \"npm run build:css:app -- --watch\" \"npm run build:css:admin -- --watch\""
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^8.0.20",
+    "@tailwindcss/cli": "^4.1.18",
+    "concurrently": "^9.2.1",
+    "tailwindcss": "^4.1.18"
+  }
+}
