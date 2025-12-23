@@ -1,6 +1,5 @@
 <div class="mb-3 flex items-center gap-2">
   <%= form_with url: "#", id: "bulk_actions_form", method: :post, local: true do %>
-    <%# 渲染为一组按钮；每个按钮使用 formaction/formmethod 以提交到对应动作 %>
     <% actions.each do |action| %>
       <%= button_tag action[:name],
         formaction: action[:path],
@@ -12,7 +11,6 @@
 </div>
 
 <script>
-  // 简易“全选”功能（可选）：如果页面包含 id="select_all" 的复选框，切换它时联动所有 name="ids[]" 的复选框
   document.addEventListener('turbo:load', function(){
     var selectAll = document.getElementById('select_all');
     if (!selectAll) return;

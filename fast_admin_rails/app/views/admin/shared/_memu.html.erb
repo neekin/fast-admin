@@ -1,0 +1,20 @@
+<nav class="mb-4 border-b bg-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <ul class="flex items-center gap-4 py-3">
+      <% admin_menu_items.each do |item| %>
+        <li class="relative group">
+          <%= link_to item[:name], item[:path], class: "text-gray-800 hover:text-blue-600" %>
+          <% if item[:submenu].present? %>
+            <ul class="absolute left-0 mt-2 hidden group-hover:block bg-white border rounded shadow min-w-[12rem]">
+              <% item[:submenu].each do |sub| %>
+                <li>
+                  <%= link_to sub[:name], sub[:path], class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</nav>

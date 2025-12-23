@@ -18,7 +18,7 @@
         <%# 选择当前记录参与批量操作 %>
         <input type="checkbox" name="ids[]" value="<%= admin_post.id %>" form="bulk_actions_form" class="mr-2">
       <% end %>
-      <%= render admin_post %>
+      <%= admin_list_item_fields(admin_post) %>
       <%= admin_list_item_actions(admin_post) %>
     </div>
   <% end %>

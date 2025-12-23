@@ -10,6 +10,12 @@ class Admin::PostsController < Admin::BaseController
     search_field name: :title, type: :text, label: "标题", order: 1
     search_field name: :content, type: :text, label: "内容", order: 2
   end
+  # 列表项展示字段配置
+  list_item_fields do
+    list_item_field name: :id, label: "ID", order: 0
+    list_item_field name: :title, label: "标题", order: 1
+    list_item_field name: :content, label: "内容", order: 2
+  end
   # 列表级别批量操作配置
   list_actions do
     list_action name: "批量审核", path: :bulk_approve_admin_posts_path, method: :patch, order: 1, css_class: "px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
@@ -18,7 +24,7 @@ class Admin::PostsController < Admin::BaseController
   menu_item name: "文章管理", icon: "article", order: 20, show_list_item: false,
     submenu: [
       { name: "审核", path: :pending_admin_posts_path, order: 1 }
-    ]
+  ]
 
   # 配置列表项的自定义操作按钮
   # 这里使用路由 helper 的 symbol，实际调用在 helper 中完成
@@ -28,6 +34,13 @@ class Admin::PostsController < Admin::BaseController
            method: :patch,
            order: 1,
            css_class: "text-purple-600 hover:text-purple-800"
+  end
+  # 声明额外的集合/成员路由，供自动路由绘制使用
+  extra_routes do
+    collection_route name: :pending, method: :get
+    collection_route name: :bulk_approve, method: :patch
+    collection_route name: :bulk_destroy, method: :delete
+    member_route name: :approve, method: :patch
   end
 
   before_action :set_admin_post, only: %i[ show edit update destroy approve ]

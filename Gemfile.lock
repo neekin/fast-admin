@@ -1,3 +1,9 @@
+PATH
+  remote: fast_admin_rails
+  specs:
+    fast_admin_rails (0.1.0)
+      rails (>= 7.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -377,6 +383,7 @@ DEPENDENCIES
   bundler-audit
   cssbundling-rails
   debug
+  fast_admin_rails!
   image_processing (~> 1.2)
   jbuilder
   jsbundling-rails

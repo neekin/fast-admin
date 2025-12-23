@@ -1,16 +1,12 @@
 Rails.application.routes.draw do
-  namespace :admin do
-    resources :posts do
-      collection do
-        get :pending
-        patch :bulk_approve
-        delete :bulk_destroy
-      end
-      member do
-        patch :approve
-      end
-    end
-    root "home#index"
+  # Mount Engine and draw host admin resources under the same scoped path (with block flexibility)
+  scope path: "/fa-admin", as: :admin, module: :admin do
+    mount FastAdminRails::Engine => "/"
+    # Auto-draw resources for Admin::* controllers under this scope
+    FastAdmin::Routing.draw_admin(self, use_scope: true, as: :admin)
+    # You can add extra routes here if needed
+    # resources :reports
+    get "home", to: "home#index"
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

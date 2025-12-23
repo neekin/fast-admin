@@ -4,18 +4,19 @@ These instructions help AI coding agents work productively in this Rails admin a
 
 ## Architecture & Conventions
 
-- Admin namespace: All admin controllers inherit from `Admin::BaseController` and use custom DSLs for navigation and list actions. See [app/controllers/admin/base_controller.rb](app/controllers/admin/base_controller.rb).
-- Discovery: Controllers auto-register via `Admin::BaseController.inherited` into `FastAdmin::Registry` ([app/lib/fast_admin/registry.rb](app/lib/fast_admin/registry.rb)); menu rendering uses this registry rather than global eager_load scans.
- - Engine-ready: Minimal Rails Engine scaffold lives at [lib/fast_admin/engine.rb](lib/fast_admin/engine.rb) and is required from [config/initializers/fast_admin.rb](config/initializers/fast_admin.rb) to keep boundaries clear for future gem extraction.
+- Admin namespace: All admin controllers inherit from `Admin::BaseController` and use custom DSLs for navigation and list actions. The base controller is provided by the gem at [fast_admin_rails/app/controllers/admin/base_controller.rb](fast_admin_rails/app/controllers/admin/base_controller.rb) and loaded via [config/initializers/fast_admin.rb](config/initializers/fast_admin.rb).
+- Discovery: Controllers auto-register via `Admin::BaseController.inherited` into `FastAdmin::Registry` ([fast_admin_rails/lib/fast_admin/registry.rb](fast_admin_rails/lib/fast_admin/registry.rb)); menu rendering uses this registry rather than global eager_load scans.
+ - Engine: Provided by the local gem at [fast_admin_rails/lib/fast_admin_rails/engine.rb](fast_admin_rails/lib/fast_admin_rails/engine.rb) and loaded via [config/initializers/fast_admin.rb](config/initializers/fast_admin.rb) with `require "fast_admin_rails"`.
 - Menu DSL:
   - Define menu metadata in controllers via `menu_item name:, icon:, order:, path:, submenu:, show_list_item:`.
-  - The menu is rendered by `admin_menu_items` in [app/helpers/admin_helper.rb](app/helpers/admin_helper.rb) and the partial [app/views/layouts/_memu.html.erb](app/views/layouts/_memu.html.erb).
+  - The menu is rendered by `admin_menu_items` in [fast_admin_rails/app/helpers/fast_admin/admin_helper.rb](fast_admin_rails/app/helpers/fast_admin/admin_helper.rb) and the partial [fast_admin_rails/app/views/admin/shared/_memu.html.erb](fast_admin_rails/app/views/admin/shared/_memu.html.erb).
+  - Route symbols resolve via helper or `main_app` with fallback to URL construction under the configured mount path.
   - Submenu `path` can be a route helper symbol (e.g. `:pending_admin_posts_path`) or a concrete URL; route symbols are resolved in helper.
   - If `show_list_item` is true (default), a "列表管理" submenu item for the controller index is auto-inserted.
 - List item actions DSL:
   - In a controller, wrap custom buttons in `list_item_actions do ... end`, and add each `action name:, path:, method:, confirm:, order:, css_class:, icon:`.
   - `path` can be a proc `->(record){ ... }` or a route helper symbol; defaults exist for 查看/编辑/删除 buttons.
-  - Rendering uses [app/views/admin/shared/_list_item_actions.html.erb](app/views/admin/shared/_list_item_actions.html.erb).
+  - Rendering uses [fast_admin_rails/app/views/admin/shared/_list_item_actions.html.erb](fast_admin_rails/app/views/admin/shared/_list_item_actions.html.erb).
   - Toggle default 查看/编辑/删除 buttons via `default_actions show:, edit:, delete:` in the controller (e.g., `default_actions show: true, edit: false, delete: false`).
   - Override default button HTML via `default_actions_html show:, edit:, delete:`; values can be strings or procs receiving the record. Example:
     ```ruby
@@ -23,7 +24,7 @@ These instructions help AI coding agents work productively in this Rails admin a
     ```
 - List bulk actions DSL:
   - Configure page-level actions via `list_actions do; list_action name:, path:, method:, confirm:, order:, css_class:, icon:; end`.
-  - Helper `admin_list_actions` renders buttons using [app/views/admin/shared/_list_actions.html.erb](app/views/admin/shared/_list_actions.html.erb); selected IDs must be provided by checkboxes named `ids[]` with `form="bulk_actions_form"`.
+  - Helper `admin_list_actions` renders buttons using [fast_admin_rails/app/views/admin/shared/_list_actions.html.erb](fast_admin_rails/app/views/admin/shared/_list_actions.html.erb); selected IDs must be provided by checkboxes named `ids[]` with `form="bulk_actions_form"`.
   - Example:
     - Generator:
       - Install initializer via `rails g fast_admin:install` (writes [config/initializers/fast_admin.rb](config/initializers/fast_admin.rb)).
@@ -41,7 +42,7 @@ These instructions help AI coding agents work productively in this Rails admin a
     ```
 - Search form DSL:
   - Configure fields via `search_fields do; search_field name:, type:, label:, options:, order:; end` in a controller.
-  - Helper `admin_search_form` renders GET form using [app/views/admin/shared/_search_form.html.erb](app/views/admin/shared/_search_form.html.erb); params are under `q[field]`.
+  - Helper `admin_search_form` renders GET form using [fast_admin_rails/app/views/admin/shared/_search_form.html.erb](fast_admin_rails/app/views/admin/shared/_search_form.html.erb); params are under `q[field]`.
   - Example:
     ```ruby
     class Admin::PostsController < Admin::BaseController
@@ -52,7 +53,7 @@ These instructions help AI coding agents work productively in this Rails admin a
     end
     ```
 - Strong parameters: Use the Rails 8 `params.expect` pattern in controllers (e.g., `params.expect(admin_post: [:title, :content])`). Prefer this over `require/permit`.
-- Routing: Admin routes use collection and member actions (e.g., `get :pending`, `patch :approve`). See [config/routes.rb](config/routes.rb).
+- Routing: Admin resource routes are auto-drawn from controllers inheriting `Admin::BaseController` via `FastAdmin::Routing.draw_admin`. See [config/routes.rb](config/routes.rb).
 - Layouts & bundles:
   - Admin layout includes `admin.css` and `admin.js`. See [app/views/layouts/admin.html.erb](app/views/layouts/admin.html.erb).
   - Application layout includes `application.css` and `application.js`. See [app/views/layouts/application.html.erb](app/views/layouts/application.html.erb).
@@ -67,7 +68,7 @@ These instructions help AI coding agents work productively in this Rails admin a
   - Generate/update with `./bin/rails stimulus:manifest:update`; new controllers go under the respective `controllers/` dir.
 
 - DSL Module:
-  - Controller-level DSL methods live in `FastAdmin::Dsl` ([lib/fast_admin/dsl.rb](lib/fast_admin/dsl.rb)); `Admin::BaseController` extends it.
+  - Controller-level DSL methods live in `FastAdmin::DSL` ([fast_admin_rails/lib/fast_admin/dsl.rb](fast_admin_rails/lib/fast_admin/dsl.rb)); `Admin::BaseController` extends it.
 
 ## Dev Workflow (macOS)
 
@@ -108,6 +109,48 @@ These instructions help AI coding agents work productively in this Rails admin a
 - Use route helper symbols in submenu or actions; the helper will resolve them. If the route is missing, it's skipped.
 - When adding new JS/CSS entry points, ensure they're emitted to `app/assets/builds` and precompiled in `assets.rb`; include in the relevant layout via `stylesheet_link_tag`/`javascript_include_tag`.
 
+### List Item Fields DSL
+- Control which record fields show on list pages:
+  - Controller: `list_item_fields do; list_item_field name:, label:, formatter:, order:; end`.
+  - Render via helper: `admin_list_item_fields(record)` using [fast_admin_rails/app/views/admin/shared/_list_item_fields.html.erb](fast_admin_rails/app/views/admin/shared/_list_item_fields.html.erb).
+  - Example:
+    ```ruby
+    class Admin::PostsController < Admin::BaseController
+      list_item_fields do
+        list_item_field name: :title, label: "标题", order: 1
+        list_item_field name: :content, label: "内容", order: 2
+      end
+    end
+    ```
+
+### Auto Routing & Mounting
+- Recommended in [config/routes.rb](config/routes.rb): mount engine and auto-draw host admin resources under the same prefix with block flexibility:
+  ```ruby
+  scope path: "/fa-admin", as: :admin, module: :admin do
+    mount FastAdminRails::Engine => "/"
+    FastAdmin::Routing.draw_admin(self, use_scope: true, as: :admin)
+    # Add extra routes here under the same prefix
+  end
+  ```
+- Or without scope block:
+  ```ruby
+  mount FastAdminRails::Engine => FastAdminRails.config.mount_path
+  FastAdmin::Routing.draw_admin(self, path: FastAdminRails.config.mount_path, as: :admin)
+  ```
+- Extra routes in controllers via DSL:
+  - `extra_routes do; collection_route name:, method:; member_route name:, method:; end`
+  - Example:
+    ```ruby
+    class Admin::PostsController < Admin::BaseController
+      extra_routes do
+        collection_route name: :pending, method: :get
+        collection_route name: :bulk_approve, method: :patch
+        collection_route name: :bulk_destroy, method: :delete
+        member_route name: :approve, method: :patch
+      end
+    end
+    ```
+
 ## Tooling
 
 - Security & static analysis (optional): `bundle exec bundler-audit`, `bundle exec brakeman`, `bundle exec rubocop`.
@@ -126,10 +169,22 @@ These instructions help AI coding agents work productively in this Rails admin a
     end
     ```
 
+- Engine/admin config via `FastAdminRails.configure`:
+  ```ruby
+  FastAdminRails.configure do |c|
+    c.mount_path = "/fa-admin"     # URL prefix for admin
+    c.route_prefix = "admin"         # Helper prefix (e.g., admin_posts_path)
+    c.layout = "admin"               # Layout used by Admin::BaseController
+    c.dashboard_enabled = false       # Toggle engine dashboard routes
+  end
+  ```
+
 ## Gotchas
 
-- In development, `admin_menu_items` calls `Rails.application.eager_load!` to discover controllers; ensure your new admin controllers are loadable (file name/class naming matches Rails conventions).
+ - In development, `admin_menu_items` calls `Rails.application.eager_load!` to discover controllers; ensure your new admin controllers are loadable (file name/class naming matches Rails conventions). Only `Admin::` namespace controllers appear in the menu; engine controllers are filtered out.
 - The list actions renderer distinguishes `link_to` vs `button_to` based on HTTP method (delete/patch/put use `button_to`). Provide `confirm` to show Turbo confirm dialogs.
+ - Menu path resolution prefers route helpers (supports `main_app`), then falls back to URL construction under the configured `mount_path`.
+ - Default 查看/编辑/删除 buttons resolve independently with route helper and `url_for` fallbacks; use `default_actions_html` to override per-button HTML when needed.
 
 ---
 If any section is unclear or missing for your current task, please share the context (file paths, workflows), and we’ll refine these instructions.
