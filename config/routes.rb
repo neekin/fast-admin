@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     resources :posts do
       collection do
         get :pending
+        patch :bulk_approve
+        delete :bulk_destroy
       end
       member do
         patch :approve

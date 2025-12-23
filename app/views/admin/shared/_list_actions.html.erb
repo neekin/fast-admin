@@ -1,0 +1,23 @@
+<div class="mb-3 flex items-center gap-2">
+  <%= form_with url: "#", id: "bulk_actions_form", method: :post, local: true do %>
+    <%# 渲染为一组按钮；每个按钮使用 formaction/formmethod 以提交到对应动作 %>
+    <% actions.each do |action| %>
+      <%= button_tag action[:name],
+        formaction: action[:path],
+        formmethod: (action[:method] || :post),
+        data: action[:confirm] ? { turbo_confirm: action[:confirm] } : {},
+        class: (action[:css_class] || "px-3 py-1 rounded bg-gray-200 text-gray-800 hover:bg-gray-300") %>
+    <% end %>
+  <% end %>
+</div>
+
+<script>
+  // 简易“全选”功能（可选）：如果页面包含 id="select_all" 的复选框，切换它时联动所有 name="ids[]" 的复选框
+  document.addEventListener('turbo:load', function(){
+    var selectAll = document.getElementById('select_all');
+    if (!selectAll) return;
+    selectAll.addEventListener('change', function(){
+      document.querySelectorAll('input[name="ids[]"]').forEach(function(cb){ cb.checked = selectAll.checked; });
+    });
+  });
+</script>

@@ -1,6 +1,10 @@
 <div class="flex items-center gap-2">
   <% actions.each do |action| %>
-    <% if action[:method] == :delete || action[:method].to_s.downcase == "delete" %>
+    <% if action[:html] %>
+      <% content = action[:html] %>
+      <% content = instance_exec(record, &content) if content.respond_to?(:call) %>
+      <%= raw(content) %>
+    <% elsif action[:method] == :delete || action[:method].to_s.downcase == "delete" %>
       <%= button_to action[:name], action[:path], 
           method: :delete,
           form: { data: action[:confirm] ? { turbo_confirm: action[:confirm] } : {} },

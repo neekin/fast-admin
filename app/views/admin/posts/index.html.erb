@@ -1,16 +1,32 @@
+
 <p style="color: green"><%= notice %></p>
 
 <% content_for :title, "Posts" %>
 
 <h1>Posts</h1>
 
+<%# 搜索表单（基于控制器配置的字段） %>
+<%= admin_search_form %>
+
+<%# 列表级别批量操作按钮 %>
+<%= admin_list_actions %>
+
 <div id="admin_posts">
   <% @admin_posts.each do |admin_post| %>
     <div class="flex items-center justify-between p-4 border-b">
+      <% if admin_has_bulk_actions? %>
+        <%# 选择当前记录参与批量操作 %>
+        <input type="checkbox" name="ids[]" value="<%= admin_post.id %>" form="bulk_actions_form" class="mr-2">
+      <% end %>
       <%= render admin_post %>
       <%= admin_list_item_actions(admin_post) %>
     </div>
   <% end %>
 </div>
 
-<%= link_to "New post", new_admin_post_path %>
+<div class="mt-4 flex items-center gap-2">
+  <% if admin_has_bulk_actions? %>
+    <input type="checkbox" id="select_all" class="mr-2"> 全选
+  <% end %>
+  <%= link_to "New post", new_admin_post_path %>
+</div>

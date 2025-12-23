@@ -1,0 +1,28 @@
+<div class="mb-4 bg-gray-50 border border-gray-200 rounded p-4">
+  <%= form_with url: index_path, method: :get, local: true do %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <% fields.each do |f| %>
+        <div>
+          <% label_text = f[:label].presence || f[:name].to_s.titleize %>
+          <label class="block text-sm font-medium text-gray-700 mb-1"><%= label_text %></label>
+          <% name = f[:name].to_s %>
+          <% val = params.dig(:q, name) %>
+          <% case f[:type].to_sym %>
+          <% when :select %>
+            <%= select_tag "q[#{name}]", options_for_select(Array(f[:options] || []), val), include_blank: true, class: "block w-full border-gray-300 rounded px-3 py-2" %>
+          <% when :text %>
+            <%= text_field_tag "q[#{name}]", val, class: "block w-full border-gray-300 rounded px-3 py-2" %>
+          <% when :number %>
+            <%= number_field_tag "q[#{name}]", val, class: "block w-full border-gray-300 rounded px-3 py-2" %>
+          <% else %>
+            <%= text_field_tag "q[#{name}]", val, class: "block w-full border-gray-300 rounded px-3 py-2" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="mt-4 flex gap-2">
+      <%= submit_tag "搜索", class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" %>
+      <%= link_to "重置", index_path, class: "px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300" %>
+    </div>
+  <% end %>
+</div>

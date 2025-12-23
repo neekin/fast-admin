@@ -1,0 +1,19 @@
+require Rails.root.join("lib/fast_admin")
+require Rails.root.join("lib/fast_admin/engine")
+begin
+  require Rails.root.join("app/lib/fast_admin/registry")
+rescue LoadError
+end
+
+# FastAdmin.configure do |c|
+#   c.default_show_list_item = true
+#   c.button_classes = {
+#     show:   "text-blue-600 hover:text-blue-800",
+#     edit:   "text-green-600 hover:text-green-800",
+#     delete: "text-red-600 hover:text-red-800"
+#   }
+#   c.confirm_texts = {
+#     delete: "确定要删除吗？"
+#   }
+#   c.custom_action_default_class = "text-blue-600 hover:text-blue-800"
+# end
