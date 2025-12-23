@@ -1,0 +1,32 @@
+<nav class="space-y-1">
+  <% admin_menu_items.each do |item| %>
+    <div>
+      <% if item[:submenu].any? %>
+        <%# 有子菜单的一级菜单项 %>
+        <div class="px-3 py-2 flex items-center gap-2 text-gray-700 font-medium">
+          <% if item[:icon].present? %>
+            <span class="icon-<%= item[:icon] %>"></span>
+          <% end %>
+          <span><%= item[:name] %></span>
+        </div>
+        <%# 二级菜单 %>
+        <div class="ml-4 space-y-1">
+          <% item[:submenu].each do |subitem| %>
+            <%= link_to subitem[:path], class: "flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-sm text-gray-600" do %>
+              <span><%= subitem[:name] %></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <%# 没有子菜单的一级菜单项 %>
+        <%= link_to item[:path], class: "flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100" do %>
+          <% if item[:icon].present? %>
+            <span class="icon-<%= item[:icon] %>"></span>
+          <% end %>
+          <span><%= item[:name] %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</nav>
+

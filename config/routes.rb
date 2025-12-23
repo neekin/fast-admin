@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
   namespace :admin do
+    resources :posts do
+      collection do
+        get :pending
+      end
+      member do
+        patch :approve
+      end
+    end
     root "home#index"
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

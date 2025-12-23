@@ -1,0 +1,21 @@
+<div class="flex items-center gap-2">
+  <% actions.each do |action| %>
+    <% if action[:method] == :delete || action[:method].to_s.downcase == "delete" %>
+      <%= button_to action[:name], action[:path], 
+          method: :delete,
+          form: { data: action[:confirm] ? { turbo_confirm: action[:confirm] } : {} },
+          class: action[:css_class] || "text-red-600 hover:text-red-800 px-2 py-1 rounded" %>
+    <% elsif action[:method] == :patch || action[:method] == :put %>
+      <%= button_to action[:name], action[:path], 
+          method: action[:method],
+          form: { data: action[:confirm] ? { turbo_confirm: action[:confirm] } : {} },
+          class: action[:css_class] || "text-blue-600 hover:text-blue-800 px-2 py-1 rounded" %>
+    <% else %>
+      <%= link_to action[:name], action[:path], 
+          method: action[:method],
+          data: action[:confirm] ? { turbo_confirm: action[:confirm] } : {},
+          class: action[:css_class] || "text-blue-600 hover:text-blue-800 px-2 py-1 rounded" %>
+    <% end %>
+  <% end %>
+</div>
+

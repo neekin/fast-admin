@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Posts" %>
+
+<h1>Posts</h1>
+
+<div id="admin_posts">
+  <% @admin_posts.each do |admin_post| %>
+    <div class="flex items-center justify-between p-4 border-b">
+      <%= render admin_post %>
+      <%= admin_list_item_actions(admin_post) %>
+    </div>
+  <% end %>
+</div>
+
+<%= link_to "New post", new_admin_post_path %>
