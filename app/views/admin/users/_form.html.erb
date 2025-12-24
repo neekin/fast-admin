@@ -1,0 +1,31 @@
+<%= form_with(model: @user, url: @user.persisted? ? admin_user_path(@user) : admin_users_path) do |form| %>
+  <% if @user.errors.any? %>
+    <div class="text-red-600 mb-3">
+      <h2><%= pluralize(@user.errors.count, "error") %> 禁止保存：</h2>
+      <ul class="list-disc ml-4">
+        <% @user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :email, style: "display: block" %>
+    <%= form.text_field :email, class: "border p-2 w-64" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :nickname, style: "display: block" %>
+    <%= form.text_field :nickname, class: "border p-2 w-64" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :password, style: "display: block" %>
+    <%= form.password_field :password, class: "border p-2 w-64" %>
+  </div>
+
+  <div>
+    <%= form.submit (@user.persisted? ? "更新" : "创建"), class: "px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700" %>
+  </div>
+<% end %>

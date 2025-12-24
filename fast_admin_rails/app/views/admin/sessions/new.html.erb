@@ -1,0 +1,18 @@
+<% content_for :title, "登录" %>
+<h1>登录</h1>
+
+<%= form_with url: admin_sessions_path, scope: :admin_session do |f| %>
+  <div class="mb-3">
+    <%= f.label :email %>
+    <%= f.email_field :email, class: "border p-2 w-64" %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :password %>
+    <%= f.password_field :password, class: "border p-2 w-64" %>
+  </div>
+  <div class="flex gap-3">
+    <%= f.submit "登录", class: "px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700" %>
+  </div>
+<% end %>
+
+<%= render "admin/shared/auth_links" %>

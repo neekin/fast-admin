@@ -1,0 +1,29 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Users" %>
+
+<h1>Users</h1>
+
+<%= admin_search_form %>
+
+<%= admin_list_actions %>
+
+<div id="admin_users">
+  <% @admin_users.each do |user| %>
+    <div class="flex items-center justify-between p-4 border-b">
+      <%= admin_bulk_checkbox(user) %>
+      <%= admin_list_item_fields(user) %>
+      <%= admin_list_item_actions(user) %>
+    </div>
+  <% end %>
+  <% if @admin_users.empty? %>
+    <div class="p-4 text-gray-500">暂无数据</div>
+  <% end %>
+  </div>
+
+<div class="mt-4 flex items-center gap-2">
+  <% if admin_has_bulk_actions? %>
+    <input type="checkbox" id="select_all" class="mr-2"> 全选
+  <% end %>
+  <%= link_to "New user", new_admin_user_path, class: "text-blue-600 hover:text-blue-800" %>
+</div>

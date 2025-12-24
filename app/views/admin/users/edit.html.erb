@@ -1,0 +1,9 @@
+<% content_for :title, "Edit User" %>
+<h1>Edit User</h1>
+
+<%= render "form" %>
+
+<div class="mt-4 flex gap-3">
+  <%= link_to "Show", admin_user_path(@user) %>
+  <%= link_to "Back", admin_users_path %>
+</div>

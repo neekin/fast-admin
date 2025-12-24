@@ -141,3 +141,104 @@ end
 - 菜单：`menu_item` 的 `submenu` 内 `path` 可用 route helper symbol 或具体 URL；可通过 `show_list_item: false` 关闭自动插入的“列表管理”。
 - 额外路由：通过 `extra_routes` 声明集合/成员动作，配合自动路由绘制（`FastAdmin::Routing.draw_admin`）使用。
 
+## 用户模型集成
+
+- 默认使用宿主应用的 `User` 模型。可通过配置覆盖：
+
+```ruby
+FastAdminRails.configure do |c|
+  c.user_class_name = "User" # 或者 "Account" 等
+end
+```
+
+- 若宿主未提供该模型，FastAdminRails 会回退到引擎内置模型 `FastAdminRails::User`，表名为 `fast_admin_users`，字段包含：
+  - `email:string` 唯一非空
+  - `nickname:string`
+  - `password_digest:string` 非空（使用 `has_secure_password`）
+  - `timestamps`
+
+- 生成回退模型的表迁移：
+
+```bash
+bin/rails g fast_admin:user
+bin/rails db:migrate
+```
+
+- 在管理端控制器中使用统一入口获取用户类：`FastAdminRails.user_class`
+
+```ruby
+class Admin::UsersController < Admin::BaseController
+  menu_item name: "用户管理", icon: "users", order: 10
+
+  search_fields do
+    search_field name: :email, type: :text, label: "邮箱"
+    search_field name: :nickname, type: :text, label: "昵称"
+  end
+
+  list_item_fields do
+    list_item_field name: :email, label: "邮箱", order: 1
+    list_item_field name: :nickname, label: "昵称", order: 2
+  end
+
+  def index
+    @users = FastAdminRails.user_class.order(id: :desc).limit(50)
+  end
+
+  def new
+    @user = FastAdminRails.user_class.new
+  end
+
+  def create
+    @user = FastAdminRails.user_class.new(user_params)
+    if @user.save
+      redirect_to admin_users_path, notice: "创建成功"
+    else
+      render :new
+    end
+  end
+
+  private
+
+  def user_params
+    params.expect(admin_user: [:email, :nickname, :password])
+  end
+end
+```
+
+这样无论宿主提供 `User` 还是使用引擎内置 `FastAdminRails::User`，管理端都能一致运作。
+
+## 管理端认证过滤（可选）
+
+- 启用登录校验并配置登录页：
+
+```ruby
+FastAdminRails.configure do |c|
+  c.require_authentication = true
+  c.login_path_name = :admin_sessions_new_path   # 登录页路由 helper（可改为宿主自定义）
+  c.session_user_key = :admin_user_id            # 会话中的用户 key
+  c.skip_auth_controllers = [                    # 在这些控制器上跳过认证（可扩展或清空）
+    "Admin::SessionsController",
+    "Admin::RegistrationsController",
+    "Admin::PasswordsController"
+  ]
+end
+```
+
+- BaseController 已内置：
+  - `helper_method :current_admin_user`
+  - `before_action :authenticate_admin!`（按配置启用）
+  - 未登录则重定向至配置的登录页；支持 `main_app` 的 helper 解析与路径回退。
+
+- 视图生成器：
+
+```bash
+bin/rails g fast_admin:user:views
+```
+
+会生成以下视图到宿主：
+- `app/views/admin/sessions/new.html.erb`（登录）
+- `app/views/admin/registrations/new.html.erb`（注册）
+- `app/views/admin/passwords/new.html.erb`（找回密码）
+- `app/views/admin/passwords/edit.html.erb`（重置密码）
+
+

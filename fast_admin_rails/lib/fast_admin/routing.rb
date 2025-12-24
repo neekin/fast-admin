@@ -51,6 +51,11 @@ module FastAdmin
               end
             end
           end
+
+          # Draw auth routes regardless of inheritance, to allow engine-provided controllers
+          resources :sessions, only: [ :new, :create, :destroy ]
+          resources :registrations, only: [ :new, :create ]
+          resources :passwords, only: [ :new, :create, :edit, :update ]
         end
 
         if use_scope
