@@ -241,4 +241,39 @@ bin/rails g fast_admin:user:views
 - `app/views/admin/passwords/new.html.erb`（找回密码）
 - `app/views/admin/passwords/edit.html.erb`（重置密码）
 
+## 权限（Pundit/Cancancan）集成
+
+- 选择适配器并（可选）启用自动授权：
+
+```ruby
+FastAdminRails.configure do |c|
+  c.authorization_adapter = :pundit   # :none | :pundit | :cancancan
+  c.auto_authorize = false            # 设为 true 时为 REST 动作自动授权（需能推断资源类）
+  c.skip_authz_controllers = [
+    "Admin::SessionsController",
+    "Admin::RegistrationsController",
+    "Admin::PasswordsController"
+  ]
+end
+```
+
+- 在控制器中使用统一方法：
+
+```ruby
+class Admin::PostsController < Admin::BaseController
+  def index
+    scope = fa_policy_scope(Post.all)
+    @admin_posts = scope.order(id: :desc)
+    fa_authorize!(:index, Post) # 显式授权（可选）
+  end
+end
+```
+
+- 错误处理：`Admin::BaseController` 已统一处理 `Pundit::NotAuthorizedError` 与 `CanCan::AccessDenied`，返回 403 或重定向。
+
+- 说明：
+  - Pundit：需在宿主 `Gemfile` 添加 `pundit` 并配置 Policy；我们不强制依赖。
+  - Cancancan：需在宿主添加 `cancancan` 并定义 `Ability`；我们不强制依赖。
+  - 若 `auto_authorize=true`，系统会基于控制器名推断资源类并在 REST 动作（index/show/new/create/edit/update/destroy）执行授权。无法推断时跳过。
+
 

@@ -2,6 +2,7 @@ module Admin
   # Gem 提供的 Admin 基类：直接继承宿主 ApplicationController，避免耦合
   class BaseController < ::ApplicationController
     layout -> { FastAdminRails.config.layout }
+    include FastAdminRails::Authorization
     # 使类具备 DSL（menu_item、list_item_actions、default_actions 等）
     class << self
       include FastAdmin::DSL
@@ -21,6 +22,15 @@ module Admin
     helper_method :current_admin_user
 
     before_action :authenticate_admin!, if: -> { FastAdminRails.config.require_authentication }
+    before_action :fa_auto_authorize!, if: -> { FastAdminRails.config.auto_authorize }
+
+    # Unified authorization error handling
+    rescue_from 'Pundit::NotAuthorizedError' do |e|
+      handle_not_authorized(e)
+    end
+    rescue_from 'CanCan::AccessDenied' do |e|
+      handle_not_authorized(e)
+    end
 
     private
 
@@ -61,6 +71,13 @@ module Admin
         rescue
           File.join(FastAdminRails.config.mount_path, "sessions/new")
         end
+      end
+    end
+    def handle_not_authorized(_error)
+      respond_to do |format|
+        format.html { redirect_to resolve_login_path, alert: "权限不足" }
+        format.turbo_stream { redirect_to resolve_login_path, alert: "权限不足" }
+        format.json { render json: { error: "forbidden" }, status: :forbidden }
       end
     end
   end

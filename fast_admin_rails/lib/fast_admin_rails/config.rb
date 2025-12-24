@@ -2,6 +2,7 @@ module FastAdminRails
   class Config
     attr_accessor :mount_path, :layout, :route_prefix, :dashboard_enabled, :user_class_name,
                   :require_authentication, :login_path_name, :session_user_key, :skip_auth_controllers
+    attr_accessor :authorization_adapter, :auto_authorize, :skip_authz_controllers, :policy_namespace
 
     def initialize
       @mount_path = "/admin"
@@ -22,6 +23,20 @@ module FastAdminRails
         "Admin::RegistrationsController",
         "Admin::PasswordsController"
       ]
+
+      # 授权（权限）配置
+      # :none | :pundit | :cancancan
+      @authorization_adapter = :none
+      # 自动为 RESTful 动作执行授权（需能推断资源类），默认关闭
+      @auto_authorize = false
+      # 在这些控制器上跳过自动授权
+      @skip_authz_controllers = [
+        "Admin::SessionsController",
+        "Admin::RegistrationsController",
+        "Admin::PasswordsController"
+      ]
+      # 可选策略命名空间（供自定义策略解析器使用）
+      @policy_namespace = nil
     end
   end
 

@@ -1,0 +1,10 @@
+class CreateFaRoles < ActiveRecord::Migration[8.1]
+  def change
+    create_table :fa_roles do |t|
+      t.string :key, null: false
+      t.string :name, null: false
+      t.timestamps
+    end
+    add_index :fa_roles, :key, unique: true
+  end
+end

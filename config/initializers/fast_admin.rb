@@ -9,6 +9,10 @@ FastAdminRails.configure do |c|
   c.route_prefix = :admin.to_s
   # Disable engine dashboard routes; host app can provide its own
   c.dashboard_enabled = false
+  # Enable authorization via Pundit (or switch to :cancancan)
+  c.authorization_adapter = :pundit
+  # Optionally auto-authorize RESTful actions (will infer resource class)
+  c.auto_authorize = true
 end
 
 # Avoid Zeitwerk autoloading generator templates under lib/generators

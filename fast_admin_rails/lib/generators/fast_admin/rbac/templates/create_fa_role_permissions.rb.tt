@@ -1,0 +1,10 @@
+class CreateFaRolePermissions < ActiveRecord::Migration[8.1]
+  def change
+    create_table :fa_role_permissions do |t|
+      t.bigint :role_id, null: false
+      t.bigint :permission_id, null: false
+      t.timestamps
+    end
+    add_index :fa_role_permissions, [:role_id, :permission_id], unique: true
+  end
+end

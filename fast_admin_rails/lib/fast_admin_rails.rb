@@ -8,6 +8,14 @@ require_relative "fast_admin/registry"
 require_relative "fast_admin_rails/config"
 require_relative "fast_admin_rails/engine"
 require_relative "fast_admin_rails/user"
+require_relative "fast_admin_rails/authorization"
+require_relative "fast_admin_rails/rbac"
+require_relative "fast_admin_rails/rbac/role"
+require_relative "fast_admin_rails/rbac/permission"
+require_relative "fast_admin_rails/rbac/role_permission"
+require_relative "fast_admin_rails/rbac/user_role"
+require_relative "fast_admin_rails/policies/application_policy"
+require_relative "fast_admin_rails/policy_factory"
 
 module FastAdminRails
   # Configure FastAdminRails only (mount path etc.)

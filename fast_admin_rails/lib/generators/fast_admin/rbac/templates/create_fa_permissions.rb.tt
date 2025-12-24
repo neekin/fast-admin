@@ -1,0 +1,10 @@
+class CreateFaPermissions < ActiveRecord::Migration[8.1]
+  def change
+    create_table :fa_permissions do |t|
+      t.string :code, null: false
+      t.string :name, null: false
+      t.timestamps
+    end
+    add_index :fa_permissions, :code, unique: true
+  end
+end
